@@ -17,11 +17,9 @@ class rahman2023_plugin : public libpressio_metrics_plugin {
       }
       else {
         // check the dimensions and hook appropriate function
+        // Expecting data dimensions in reverse order, for example with Hurricane dataset 500x500x100
         switch (input->num_dimensions()) 
         {
-        case 1:
-          // not implemented in FXRZ
-          break;
         case 2:
           // not implemented in FXRZ
           break;
@@ -34,7 +32,7 @@ class rahman2023_plugin : public libpressio_metrics_plugin {
           runFXRZwith3DData(input);
           break;
         default:
-          printf("Not valid number of dimenstions. Number of dimensions must be among 1, 2 or 3.")
+          printf("Not valid number of dimenstions. Number of dimensions must be among 2 or 3.")
           break;
         }
       }
@@ -117,7 +115,7 @@ class rahman2023_plugin : public libpressio_metrics_plugin {
     // Utilities end
 
     // Feature extraction start
-    std::vector <double> runFeatureExtractionwith3DData(const void *data, enum pressio_dtype dtype, const int num_entries, 
+    std::vector <double> runFeatureExtractionwith3DData(const void *data, const enum pressio_dtype dtype, const int num_entries, 
                                               const size_t num_dims, 
                                               std::vector<size_t> dims, double &data_min, 
                                               double &data_max) {
@@ -287,7 +285,7 @@ class rahman2023_plugin : public libpressio_metrics_plugin {
     // Feature extraction end
 
     // Start run optimization: adjusting compression ratio
-    int determineCurrent3DBlock(const void *data, enum pressio_dtype dtype, 
+    int determineCurrent3DBlock(const void *data, const enum pressio_dtype dtype, 
                                               const size_t* block_starts,
                                               const int num_entries, 
                                               const size_t num_dims, 
@@ -325,7 +323,7 @@ class rahman2023_plugin : public libpressio_metrics_plugin {
 
     }
 
-    double runAdjustingCompressionRatioOptimizationwith3DData(const void *data, enum pressio_dtype dtype, const int num_entries, 
+    double runAdjustingCompressionRatioOptimizationwith3DData(const void *data, const enum pressio_dtype dtype, const int num_entries, 
                                               const size_t num_dims, 
                                               std::vector<size_t> dims,
                                               double closeness_threshold) {
@@ -381,8 +379,19 @@ class rahman2023_plugin : public libpressio_metrics_plugin {
 
       // perform optimization: adjusting compression ratio
       double closeness_threshold = avg_val * 0.15;
+      double non_constant_block_percentage = runAdjustingCompressionRatioOptimizationwith3DData(input->data, 
+                                              input->dtype, num_entries, 
+                                              num_dims, 
+                                              dims,
+                                              closeness_threshold);
 
-      
+      nonConstantBlockPercentage = changeScale(non_constant_block_percentage, 0.0, 1.0, 0.5, 1.0 );
+      valueRange = features[0];
+      meanValue = features[1];
+      meanNeighborDifference = features[2];
+      meanLorenzoDifference = features[3];
+      meanSplineDifference = features[4];
+
     }
       
 };
