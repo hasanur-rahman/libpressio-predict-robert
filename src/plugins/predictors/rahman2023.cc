@@ -20,13 +20,13 @@ class rahman2023_plugin : public libpressio_metrics_plugin {
         // Expecting data dimensions in reverse order, for example with Hurricane dataset 500x500x100
         // make sure data has either of only two types
         if (input->dtype() != pressio_float_dtype && input->dtype() != pressio_double_dtype) {
-          printf("Data type must be single or double precision floating point");
+          printf("Data type must be single or double precision floating point for FXRZ");
           exit(0);
         }
         switch (input->num_dimensions()) 
         {
         case 1:
-          runFXRZwith1DData(input);
+          runFXRZwith1DData(input); 
           break;
         case 2:
           runFXRZwith2DData(input);
@@ -869,7 +869,7 @@ class rahman2023_plugin : public libpressio_metrics_plugin {
       meanSplineDifference = features[4];
 
     }
-    /** For 2D dataset end */ 
+    /** For 3D dataset end */ 
       
 };
 
